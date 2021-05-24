@@ -76,7 +76,7 @@ For example:
   (list
    `(,builtin-regex . font-lock-builtin-face)
    `(,constant-regex . font-lock-constant-face)
-   `(,(concat "#" cue--identifier-regexp "+:?") . font-lock-type-face)
+   `(,(concat "_?#" cue--identifier-regexp "+:?") . font-lock-type-face)
    `(,(concat cue--identifier-regexp "+:") . font-lock-keyword-face)
    `(,standard-functions-regex . font-lock-function-name-face)
    ))

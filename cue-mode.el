@@ -76,8 +76,12 @@ For example:
   (list
    `(,builtin-regex . font-lock-builtin-face)
    `(,constant-regex . font-lock-constant-face)
+   ;; identifiers starting with a # or _ are reserved for definitions
+   ;; and hidden fields
    `(,(concat "_?#" cue--identifier-regexp "+:?") . font-lock-type-face)
    `(,(concat cue--identifier-regexp "+:") . font-lock-keyword-face)
+   ;; all identifiers starting with __(double underscores) as keywords
+   `(,(concat "__" cue--identifier-regexp) . font-lock-keyword-face)
    `(,standard-functions-regex . font-lock-function-name-face)
    ))
 "Minimal highlighting for ‘cue-mode’.")

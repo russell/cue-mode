@@ -1,0 +1,4 @@
+/bazel-bin
+/bazel-cue-mode
+/bazel-out
+/bazel-testlogs

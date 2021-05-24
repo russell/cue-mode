@@ -24,6 +24,7 @@
 
 ;;; Code:
 
+(require 'cl-extra)
 
 (defgroup cue '()
   "Major mode for editing Cue files."
@@ -65,13 +66,13 @@ For example:
         (constant-regex (regexp-opt '("false" "null" "true") 'words))
         ;; All builtin functions (see https://cue.org/docs/references/spec/#builtin-functions)
         (standard-functions-regex (regexp-opt '("len" "close" "and" "or" "div" "mod" "quo" "rem")))
-
     )
   (list
    `(,builtin-regex . font-lock-builtin-face)
    `(,constant-regex . font-lock-constant-face)
    `(,(concat "#" cue--identifier-regexp "+:?") . font-lock-type-face)
    `(,(concat cue--identifier-regexp "+:") . font-lock-keyword-face)
+   `(,standard-functions-regex . font-lock-function-name-face)
    ))
 "Minimal highlighting for ‘cue-mode’.")
 

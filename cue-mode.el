@@ -57,6 +57,12 @@ For example:
   :type '(repeat directory)
   :group 'cue)
 
+(defcustom cue-indent-level
+  4
+  "Number of spaces to indent with."
+  :type '(number)
+  :group 'cue)
+
 (defvar cue--identifier-regexp
   "[a-zA-Z_][a-zA-Z0-9_]*"
   "Regular expression matching a Cue identifier.")
@@ -141,8 +147,17 @@ For example:
               cue-syntax-propertize-function)
 
   ;; cue lang uses tabs for indent by default
-  (setq indent-tabs-mode t))
+  (setq-local indent-tabs-mode t)
+  (setq-local tab-width cue-indent-level)
 
+
+  (setq-local comment-start "// ")
+  (setq-local comment-start-skip "//+[\t ]*")
+  (setq-local comment-end "")
+  )
+
+;;;###autoload
+(add-to-list 'auto-mode-alist (cons "\\.cue\\'" 'cue-mode))
 
 ;;;###autoload
 (defun cue-eval-buffer ()

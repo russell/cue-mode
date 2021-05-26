@@ -3,7 +3,7 @@
 ;; Copyright (C) 2021  Russell Sim
 
 ;; Author: Russell Sim <russell.sim@gmail.com>
-;; Keywords: convenience, tools
+;; Keywords: languages
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -24,6 +24,7 @@
 
 ;;; Code:
 
+(require 'smie)
 (require 'cl-extra)
 
 (defgroup cue '()
@@ -71,7 +72,7 @@ For example:
   (let ((builtin-regex (regexp-opt '("package" "import" "for" "in" "if" "let") 'words))
         (constant-regex (regexp-opt '("false" "null" "true") 'words))
         ;; All builtin functions (see https://cue.org/docs/references/spec/#builtin-functions)
-        (standard-functions-regex (regexp-opt '("len" "close" "and" "or" "div" "mod" "quo" "rem")))
+        (standard-functions-regex (regexp-opt '("len" "close" "and" "or" "div" "mod" "quo" "rem") 'words))
     )
   (list
    `(,builtin-regex . font-lock-builtin-face)
@@ -111,6 +112,128 @@ For example:
            (put-text-property (1- quote-ending-pos) quote-ending-pos
                               'syntax-table (string-to-syntax "|"))))))
 
+
+(defvar cue-smie-verbose-p nil
+  "Emit context information about the current syntax state.")
+
+(defmacro cue-smie-debug (message &rest format-args)
+  `(progn
+     (when cue-smie-verbose-p
+       (message (format ,message ,@format-args)))
+     nil))
+
+(defun verbose-cue-smie-rules (kind token)
+  (let ((value (cue-smie-rules kind token)))
+    (cue-smie-debug "%s '%s'; sibling-p:%s prev-is-OP:%s hanging:%s == %s" kind token
+                       (ignore-errors (smie-rule-sibling-p))
+                       (ignore-errors (smie-rule-prev-p "OP"))
+                       (ignore-errors (smie-rule-hanging-p))
+                       value)
+    value))
+
+(defvar cue-smie-grammar
+  (smie-prec2->grammar
+   (smie-merge-prec2s
+    (smie-bnf->prec2
+     '(
+       (exps (exp "," exp))
+       (exp (field)
+            ("import" id)
+            ("package" id)
+            (id))
+       (field (id ":" exp))
+       (id))
+      '((assoc ",") (assoc "\n") (left ":") (left ".") (left "let"))
+      '((right "=")))
+
+    (smie-precs->prec2
+     '((right "=")
+       (left "||" "|")
+       (left "&&" "&")
+       (nonassoc "=~" "!~" "!=" "==" "<=" ">=" "<" ">")
+       (left "+" "-")
+       (left "*" "/"))))))
+
+;; Operators
+;; +     &&    ==    <     =     (     )
+;; -     ||    !=    >     :     {     }
+;; *     &     =~    <=    ?     [     ]     ,
+;; /     |     !~    >=    !     _|_   ...   .
+;; _|_ bottom
+
+(defun cue-smie-rules (kind token)
+  (pcase (cons kind token)
+    (`(:elem . basic) smie-indent-basic)
+    (`(,_ . ",") (cue-smie--indent-nested))
+    (`(,_ . "}") (cue-smie--indent-closing))
+    (`(,_ . "]") (smie-rule-parent (- 0 cue-indent-level)))
+    (`(,_ . ")") (smie-rule-parent (- 0 cue-indent-level)))
+    ))
+
+(defun cue-smie--in-object-p ()
+  "Return t if the current block we are in is wrapped in {}."
+  (let ((ppss (syntax-ppss)))
+    (or (null (nth 1 ppss))
+        (and (nth 1 ppss)
+             (or
+              (eq ?{ (char-after (nth 1 ppss)))
+              (eq ?\( (char-after (nth 1 ppss))))))))
+
+
+(defun cue-smie-backward-token ()
+  (let ((pos (point)))
+    (forward-comment (- (point)))
+    (cond
+     ((and (not (eq (char-before) ?\,)) ;Coalesce ";" and "\n".
+           (> pos (line-end-position))
+           (cue-smie--in-object-p))
+      (skip-chars-forward " \t")
+      ;; Why bother distinguishing \n and ,?
+      ",") ;;"\n"
+     (t
+      (buffer-substring-no-properties
+       (point)
+       (progn (if (zerop (skip-syntax-backward "."))
+                  (skip-syntax-backward "w_'"))
+              (point)))))))
+
+
+(defun cue-smie-forward-token ()
+  (skip-chars-forward " \t")
+  (cond
+   ((and (looking-at "[\n]")
+         (or (save-excursion (skip-chars-backward " \t")
+                             ;; Only add implicit , when needed.
+                             (or (bolp) (eq (char-before) ?\,)))
+             (cue-smie--in-object-p)))
+    (if (eolp) (forward-char 1) (forward-comment 1))
+    ;; Why bother distinguishing \n and ;?
+    ",") ;;"\n"
+   ((progn (forward-comment (point-max)) nil))
+   (t
+    (buffer-substring-no-properties
+     (point)
+     (progn (if (zerop (skip-syntax-forward "."))
+                (skip-syntax-forward "w_'"))
+            (point))))))
+
+(defun cue-smie--indent-nested ()
+  (let ((ppss (syntax-ppss)))
+    (if (nth 1 ppss)
+        (let ((parent-indentation (save-excursion
+                                    (goto-char (nth 1 ppss))
+                                    (back-to-indentation)
+                                    (current-column))))
+          (cons 'column (+ parent-indentation cue-indent-level))))))
+
+(defun cue-smie--indent-closing ()
+  (let ((ppss (syntax-ppss)))
+    (if (nth 1 ppss)
+        (let ((parent-indentation (save-excursion
+                                    (goto-char (nth 1 ppss))
+                                    (back-to-indentation)
+                                    (current-column))))
+          (cons 'column parent-indentation)))))
 
 (defvar cue-syntax-propertize-function
   (syntax-propertize-rules
@@ -154,6 +277,20 @@ For example:
   (setq-local indent-tabs-mode t)
   (setq-local tab-width cue-indent-level)
 
+  (smie-setup cue-smie-grammar 'verbose-cue-smie-rules
+              :forward-token  #'cue-smie-forward-token
+              :backward-token #'cue-smie-backward-token)
+  (setq-local smie-indent-basic cue-indent-level)
+  (setq-local smie-indent-functions '(smie-indent-fixindent
+                                      smie-indent-bob
+                                      smie-indent-comment
+                                      smie-indent-comment-continue
+                                      smie-indent-comment-close
+                                      smie-indent-comment-inside
+                                      smie-indent-keyword
+                                      smie-indent-after-keyword
+                                      smie-indent-empty-line
+                                      smie-indent-exps))
 
   (setq-local comment-start "// ")
   (setq-local comment-start-skip "//+[\t ]*")

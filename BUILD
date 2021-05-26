@@ -27,7 +27,7 @@ elisp_library(
 # )
 
 elisp_test(
-    name = "lib_1_test",
-    srcs = ["tests/cue-mode-test.el"],
+    name = "indent",
+    srcs = ["cue-mode-indent-tests.el"],
     deps = [":cue-mode"],
 )

@@ -1,0 +1,26 @@
+[[https://www.gnu.org/licenses/gpl-3.0][file:https://img.shields.io/badge/License-GPL%20v3-blue.svg]]
+
+* cue-mode
+
+  Provides Emacs font-lock, indentation, and some useful functions for
+  the CUE data validation language.
+
+** Dependencies
+
+   Depends on the CUE Lang CLI tool for formatting and evaluating
+   files. This can be installed by following this [[https://cuelang.org/docs/install/][documentation]].
+
+** Features
+
+*** Indentation
+
+    Indentation is implemented via the SMIE package, it has only been
+    tested with some sample files. There are test cases so any fixes
+    should come with a test.
+
+*** Keybindings
+
+    | Key Binding | Function              | Purpose                                         |
+    |-------------+-----------------------+-------------------------------------------------|
+    | `C-c C-r`   | `cue-reformat-buffer` | Reformat the current buffer                     |
+    | `C-c C-c`   | `cue-eval-buffer`     | Evaluate the current buffer and show the output |

@@ -3,9 +3,14 @@
 ;;; Code:
 
 
-;;;### (autoloads nil "cue-mode" "cue-mode.el" (24747 63035 423872
-;;;;;;  517000))
+;;;### (autoloads nil "cue-mode" "cue-mode.el" (24767 46588 8297
+;;;;;;  445000))
 ;;; Generated autoloads from cue-mode.el
+
+(autoload 'cue-mode "cue-mode" "\
+
+
+\(fn)" t nil)
 
 (add-to-list 'auto-mode-alist (cons "\\.cue\\'" 'cue-mode))
 

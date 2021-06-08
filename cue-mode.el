@@ -261,6 +261,7 @@ For example:
   "Syntax table for `cue-mode'.")
 
 
+;;;###autoload
 (define-derived-mode cue-mode prog-mode "CUE Lang Mode"
   :syntax-table cue-mode-syntax-table
   (setq-local font-lock-defaults '(cue-font-lock-keywords ;; keywords

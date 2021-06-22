@@ -72,20 +72,18 @@ For example:
   (let ((builtin-regex (regexp-opt '("package" "import" "for" "in" "if" "let") 'words))
         (constant-regex (regexp-opt '("false" "null" "true") 'words))
         ;; All builtin functions (see https://cue.org/docs/references/spec/#builtin-functions)
-        (standard-functions-regex (regexp-opt '("len" "close" "and" "or" "div" "mod" "quo" "rem") 'words))
-    )
-  (list
-   `(,builtin-regex . font-lock-builtin-face)
-   `(,constant-regex . font-lock-constant-face)
-   ;; identifiers starting with a # or _ are reserved for definitions
-   ;; and hidden fields
-   `(,(concat "_?#" cue--identifier-regexp "+:?") . font-lock-type-face)
-   `(,(concat cue--identifier-regexp "+:") . font-lock-keyword-face)
-   ;; all identifiers starting with __(double underscores) as keywords
-   `(,(concat "__" cue--identifier-regexp) . font-lock-keyword-face)
-   `(,standard-functions-regex . font-lock-function-name-face)
-   ))
-"Minimal highlighting for ‘cue-mode’.")
+        (standard-functions-regex (regexp-opt '("len" "close" "and" "or" "div" "mod" "quo" "rem") 'words)))
+    (list
+     `(,builtin-regex . font-lock-builtin-face)
+     `(,constant-regex . font-lock-constant-face)
+     ;; identifiers starting with a # or _ are reserved for definitions
+     ;; and hidden fields
+     `(,(concat "_?#" cue--identifier-regexp "+:?") . font-lock-type-face)
+     `(,(concat cue--identifier-regexp "+:") . font-lock-keyword-face)
+     ;; all identifiers starting with __(double underscores) as keywords
+     `(,(concat "__" cue--identifier-regexp) . font-lock-keyword-face)
+     `(,standard-functions-regex . font-lock-function-name-face)))
+  "Minimal highlighting for ‘cue-mode’.")
 
 (defun cue-syntax-stringify ()
   "Put `syntax-table' property correctly on single/triple quotes."
@@ -125,26 +123,25 @@ For example:
 (defun verbose-cue-smie-rules (kind token)
   (let ((value (cue-smie-rules kind token)))
     (cue-smie-debug "%s '%s'; sibling-p:%s prev-is-OP:%s hanging:%s == %s" kind token
-                       (ignore-errors (smie-rule-sibling-p))
-                       (ignore-errors (smie-rule-prev-p "OP"))
-                       (ignore-errors (smie-rule-hanging-p))
-                       value)
+                    (ignore-errors (smie-rule-sibling-p))
+                    (ignore-errors (smie-rule-prev-p "OP"))
+                    (ignore-errors (smie-rule-hanging-p))
+                    value)
     value))
 
 (defvar cue-smie-grammar
   (smie-prec2->grammar
    (smie-merge-prec2s
     (smie-bnf->prec2
-     '(
-       (exps (exp "," exp))
+     '((exps (exp "," exp))
        (exp (field)
             ("import" id)
             ("package" id)
             (id))
        (field (id ":" exp))
        (id))
-      '((assoc ",") (assoc "\n") (left ":") (left ".") (left "let"))
-      '((right "=")))
+     '((assoc ",") (assoc "\n") (left ":") (left ".") (left "let"))
+     '((right "=")))
 
     (smie-precs->prec2
      '((right "=")

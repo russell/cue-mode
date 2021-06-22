@@ -314,27 +314,25 @@ For example:
                          (lambda ()
                            (member (file-name-directory (file-truename (buffer-file-name)))
                                    directories))))
-    (when-let ((output-window (get-buffer-window output-buffer-name t)))
-      (quit-window nil output-window)
-      (redisplay))
-    (with-current-buffer (get-buffer-create output-buffer-name)
-      (setq buffer-read-only nil)
-      (erase-buffer)
-      (let ((args (nconc (cdr cue-eval-command)
-                         cue-command-options
-                         (cl-loop for dir in search-dirs
-                                  collect "-I"
-                                  collect dir)
-                         (list file-to-eval))))
-        (if (zerop (apply #'call-process (car cue-eval-command) nil t nil args))
-            (progn (cue-mode))
-          (compilation-mode nil)))
-      (goto-char (point-min))
-      (display-buffer (current-buffer)
-                      '((display-buffer-pop-up-window
-                         display-buffer-reuse-window
-                         display-buffer-at-bottom
-                         display-buffer-pop-up-frame))))))
+    (let ((cmd (car cue-eval-command))
+          (args (append (cdr cue-eval-command)
+                        cue-command-options
+                        (cl-loop for dir in search-dirs
+                                 collect "-I"
+                                 collect dir)
+                        (list file-to-eval))))
+      (let ((outbuf (get-buffer-create output-buffer-name)))
+        (with-current-buffer outbuf
+          (let ((origional-point (point)))
+            (setq buffer-read-only nil)
+            (erase-buffer)
+            (if (zerop (apply #'call-process cmd nil t nil args))
+                (progn
+                  (cue-mode)
+                  (view-mode))
+              (compilation-mode nil))
+            (goto-char origional-point)))
+        (display-buffer outbuf '(nil (allow-no-window . t)))))))
 
 (define-key cue-mode-map (kbd "C-c C-c") 'cue-eval-buffer)
 

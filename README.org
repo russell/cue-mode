@@ -24,3 +24,15 @@
     |-------------+-----------------------+-------------------------------------------------|
     | `C-c C-r`   | `cue-reformat-buffer` | Reformat the current buffer                     |
     | `C-c C-c`   | `cue-eval-buffer`     | Evaluate the current buffer and show the output |
+
+** Testing
+
+This project is using Bazel for testing, if you don't have it the
+easiest way to get it is by installing [[https://github.com/bazelbuild/bazelisk][Bazelisk]].
+
+You can run the following command to run the tests
+#+begin_src sh
+basel test //...  --test_output=errors
+# or, depending on how you installed
+bazelisk test //...  --test_output=errors
+#+end_src

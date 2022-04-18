@@ -1,9 +1,9 @@
-;;; cue-mode.el --- CUE Lang Major Mode          -*- lexical-binding: t; -*-
+;;; cue-mode.el --- Major mode for CUE Lang files   -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2021  Russell Sim
 
 ;; Author: Russell Sim <russell.sim@gmail.com>
-;; Keywords: languages
+;; Keywords: data, languages
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by

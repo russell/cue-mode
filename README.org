@@ -36,3 +36,10 @@ basel test //...  --test_output=errors
 # or, depending on how you installed
 bazelisk test //...  --test_output=errors
 #+end_src
+
+** Updating Autoloads
+
+Updating autoloads can be done via this command
+#+begin_src sh
+bazel run //:generate-autoloads
+#+end_src

@@ -28,6 +28,6 @@ elisp_library(
 
 elisp_test(
     name = "indent",
-    srcs = ["cue-mode-indent-tests.el"],
+    srcs = ["tests/cue-mode-indent-tests.el"],
     deps = [":cue-mode"],
 )

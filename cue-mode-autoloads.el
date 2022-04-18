@@ -3,8 +3,7 @@
 ;;; Code:
 
 
-;;;### (autoloads nil "cue-mode" "cue-mode.el" (24767 46588 8297
-;;;;;;  445000))
+;;;### (autoloads nil "cue-mode" "cue-mode.el" (0 0 0 0))
 ;;; Generated autoloads from cue-mode.el
 
 (autoload 'cue-mode "cue-mode" "\

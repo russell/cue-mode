@@ -120,6 +120,10 @@ For example:
   "Emit context information about the current syntax state.")
 
 (defmacro cue-smie-debug (message &rest format-args)
+  "Emit debug log for SMIE if `cue-smie-verbose-p' is true.
+
+`MESSAGE' is a format string and a `FORMAT-ARGS' are the list of
+values to be formatted."
   `(progn
      (when cue-smie-verbose-p
        (message (format ,message ,@format-args)))

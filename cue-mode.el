@@ -1,9 +1,11 @@
-;;; cue-mode.el --- Major mode for CUE Lang files   -*- lexical-binding: t; -*-
+;;; cue-mode.el --- Major mode for CUE language files -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2021-2022  Russell Sim
 
 ;; Author: Russell Sim <russell.sim@gmail.com>
 ;; Keywords: data, languages
+;; Package-Requires: ((emacs "25.1"))
+;; URL: https://github.com/russell/cue-mode
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -129,7 +131,7 @@ values to be formatted."
        (message (format ,message ,@format-args)))
      nil))
 
-(defun verbose-cue-smie-rules (kind token)
+(defun cue-smie-rules-verbose (kind token)
   (let ((value (cue-smie-rules kind token)))
     (cue-smie-debug "%s '%s'; sibling-p:%s prev-is-OP:%s hanging:%s == %s" kind token
                     (ignore-errors (smie-rule-sibling-p))
@@ -173,8 +175,7 @@ values to be formatted."
     (`(,_ . ",") (cue-smie--indent-nested))
     (`(,_ . "}") (cue-smie--indent-closing))
     (`(,_ . "]") (smie-rule-parent (- 0 cue-indent-level)))
-    (`(,_ . ")") (smie-rule-parent (- 0 cue-indent-level)))
-    ))
+    (`(,_ . ")") (smie-rule-parent (- 0 cue-indent-level)))))
 
 (defun cue-smie--in-object-p ()
   "Return t if the current block we are in is wrapped in {}."
@@ -268,7 +269,7 @@ values to be formatted."
 
 
 ;;;###autoload
-(define-derived-mode cue-mode prog-mode "CUE Lang Mode"
+(define-derived-mode cue-mode prog-mode "CUE language Mode"
   :syntax-table cue-mode-syntax-table
   (setq-local font-lock-defaults '(cue-font-lock-keywords ;; keywords
                                    nil  ;; keywords-only
@@ -284,7 +285,7 @@ values to be formatted."
   (setq-local indent-tabs-mode t)
   (setq-local tab-width cue-indent-level)
 
-  (smie-setup cue-smie-grammar 'verbose-cue-smie-rules
+  (smie-setup cue-smie-grammar 'cue-smie-rules-verbose
               :forward-token  #'cue-smie-forward-token
               :backward-token #'cue-smie-backward-token)
   (setq-local smie-indent-basic cue-indent-level)
@@ -301,8 +302,7 @@ values to be formatted."
 
   (setq-local comment-start "// ")
   (setq-local comment-start-skip "//+[\t ]*")
-  (setq-local comment-end "")
-  )
+  (setq-local comment-end ""))
 
 ;;;###autoload
 (add-to-list 'auto-mode-alist (cons "\\.cue\\'" 'cue-mode))

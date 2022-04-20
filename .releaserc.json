@@ -3,7 +3,12 @@
   "plugins": [
     "@semantic-release/commit-analyzer",
     "@semantic-release/release-notes-generator",
-    "@semantic-release/github",
-    "@semantic-release/git"
+    ["@semantic-release/exec", {
+      "generateNotesCmd": "./hack/update_version.sh ${nextRelease.version}"
+    }],
+    ["@semantic-release/git", {
+      "assets": ["cue-mode.el"]
+    }],
+    "@semantic-release/github"
   ]
 }

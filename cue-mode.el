@@ -133,6 +133,10 @@ values to be formatted."
      nil))
 
 (defun cue-smie-rules-verbose (kind token)
+  "Apply SMIE indentation rules for a particular KIND, TOKEN.
+
+KIND is :BEFORE, :AFTER, :ELEM, or :LIST-INTRO, and TOKEN in the
+syntax that the rule operates on."
   (let ((value (cue-smie-rules kind token)))
     (cue-smie-debug "%s '%s'; sibling-p:%s prev-is-OP:%s hanging:%s == %s" kind token
                     (ignore-errors (smie-rule-sibling-p))
@@ -142,6 +146,7 @@ values to be formatted."
     value))
 
 (defvar cue-smie-grammar
+  "CUE language grammar tables"
   (smie-prec2->grammar
    (smie-merge-prec2s
     (smie-bnf->prec2
@@ -171,6 +176,10 @@ values to be formatted."
 ;; _|_ bottom
 
 (defun cue-smie-rules (kind token)
+  "Apply SMIE indentation rules for a particular KIND, TOKEN.
+
+KIND is :BEFORE, :AFTER, :ELEM, or :LIST-INTRO, and TOKEN in the
+syntax that the rule operates on."
   (pcase (cons kind token)
     (`(:elem . basic) smie-indent-basic)
     (`(,_ . ",") (cue-smie--indent-nested))
@@ -188,25 +197,12 @@ values to be formatted."
               (eq ?\( (char-after (nth 1 ppss))))))))
 
 
-(defun cue-smie-backward-token ()
-  (let ((pos (point)))
-    (forward-comment (- (point)))
-    (cond
-     ((and (not (eq (char-before) ?\,)) ;Coalesce ";" and "\n".
-           (> pos (line-end-position))
-           (cue-smie--in-object-p))
-      (skip-chars-forward " \t")
-      ;; Why bother distinguishing \n and ,?
-      ",") ;;"\n"
-     (t
-      (buffer-substring-no-properties
-       (point)
-       (progn (if (zerop (skip-syntax-backward "."))
-                  (skip-syntax-backward "w_'"))
-              (point)))))))
-
-
 (defun cue-smie-forward-token ()
+  "Function to scan forward for the next token.
+Called with no argument should return a token and move to its end.
+If no token is found, return nil or the empty string.
+It can return nil when bumping into a parenthesis, which lets SMIE
+use syntax-tables to handle them in efficient C code."
   (skip-chars-forward " \t")
   (cond
    ((and (looking-at "[\n]")
@@ -225,7 +221,29 @@ values to be formatted."
                 (skip-syntax-forward "w_'"))
             (point))))))
 
+(defun cue-smie-backward-token ()
+  "Function to scan backward the previous token.
+Same calling convention as `cue-smie-forward-token' except
+it should move backward to the beginning of the previous token."
+  (let ((pos (point)))
+    (forward-comment (- (point)))
+    (cond
+     ((and (not (eq (char-before) ?\,)) ;Coalesce ";" and "\n".
+           (> pos (line-end-position))
+           (cue-smie--in-object-p))
+      (skip-chars-forward " \t")
+      ;; Why bother distinguishing \n and ,?
+      ",") ;;"\n"
+     (t
+      (buffer-substring-no-properties
+       (point)
+       (progn (if (zerop (skip-syntax-backward "."))
+                  (skip-syntax-backward "w_'"))
+              (point)))))))
+
+
 (defun cue-smie--indent-nested ()
+  "Apply indentation for for a nested element."
   (let ((ppss (syntax-ppss)))
     (if (nth 1 ppss)
         (let ((parent-indentation (save-excursion
@@ -235,6 +253,7 @@ values to be formatted."
           (cons 'column (+ parent-indentation cue-indent-level))))))
 
 (defun cue-smie--indent-closing ()
+  "Apply indentation for a closing scope."
   (let ((ppss (syntax-ppss)))
     (if (nth 1 ppss)
         (let ((parent-indentation (save-excursion

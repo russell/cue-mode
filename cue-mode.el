@@ -146,7 +146,6 @@ syntax that the rule operates on."
     value))
 
 (defvar cue-smie-grammar
-  "CUE language grammar tables"
   (smie-prec2->grammar
    (smie-merge-prec2s
     (smie-bnf->prec2
@@ -166,7 +165,8 @@ syntax that the rule operates on."
        (left "&&" "&")
        (nonassoc "=~" "!~" "!=" "==" "<=" ">=" "<" ">")
        (left "+" "-")
-       (left "*" "/"))))))
+       (left "*" "/")))))
+  "CUE language grammar tables.")
 
 ;; Operators
 ;; +     &&    ==    <     =     (     )

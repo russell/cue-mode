@@ -60,7 +60,6 @@ For example:
   :type '(repeat string)
   :group 'cue)
 
-
 (defcustom cue-library-search-directories
   nil "Sequence of Cue package search directories."
   :type '(repeat directory)
@@ -119,7 +118,6 @@ For example:
            ;; This set of quotes delimit the end of a string.
            (put-text-property (1- quote-ending-pos) quote-ending-pos
                               'syntax-table (string-to-syntax "|"))))))
-
 
 (defvar cue-smie-verbose-p nil
   "Emit context information about the current syntax state.")
@@ -198,7 +196,6 @@ syntax that the rule operates on."
               (eq ?{ (char-after (nth 1 ppss)))
               (eq ?\( (char-after (nth 1 ppss))))))))
 
-
 (defun cue-smie-forward-token ()
   "Function to scan forward for the next token.
 Called with no argument should return a token and move to its end.
@@ -242,7 +239,6 @@ it should move backward to the beginning of the previous token."
        (progn (if (zerop (skip-syntax-backward "."))
                   (skip-syntax-backward "w_'"))
               (point)))))))
-
 
 (defun cue-smie--indent-nested ()
   "Apply indentation for for a nested element."

@@ -285,9 +285,18 @@ it should move backward to the beginning of the previous token."
     table)
   "Syntax table for `cue-mode'.")
 
+(defvar cue-mode-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map (kbd "C-c C-c") 'cue-eval-buffer)
+    (define-key map (kbd "C-c C-r") 'cue-reformat-buffer)
+    map)
+  "Keymap used in CUE mode.")
 
 ;;;###autoload
-(define-derived-mode cue-mode prog-mode "CUE language Mode"
+(define-derived-mode cue-mode prog-mode "CUE Mode"
+  "Major mode for editing CUE files.
+
+\\{cue-mode-map}"
   :syntax-table cue-mode-syntax-table
   (setq-local font-lock-defaults '(cue-font-lock-keywords ;; keywords
                                    nil  ;; keywords-only
@@ -359,9 +368,6 @@ it should move backward to the beginning of the previous token."
             (goto-char origional-point)))
         (display-buffer outbuf '(nil (allow-no-window . t)))))))
 
-(define-key cue-mode-map (kbd "C-c C-c") 'cue-eval-buffer)
-
-
 ;;;###autoload
 (defun cue-reformat-buffer ()
   "Reformat entire buffer using the CUE format utility."
@@ -407,8 +413,6 @@ it should move backward to the beginning of the previous token."
                                        .
                                        ((window-height . fit-window-to-buffer))))))))
       (delete-file stderr-file))))
-
-(define-key cue-mode-map (kbd "C-c C-r") 'cue-reformat-buffer)
 
 (provide 'cue-mode)
 ;;; cue-mode.el ends here

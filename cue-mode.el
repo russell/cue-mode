@@ -36,12 +36,12 @@
 (require 'cl-extra)
 
 (defgroup cue '()
-  "Major mode for editing Cue files."
+  "Major mode for editing CUE files."
   :group 'languages)
 
 (defcustom cue-eval-command
   '("cue" "eval")
-  "Cue command to run in ‘cue-eval-buffer’.
+  "CUE command to run in ‘cue-eval-buffer’.
 See also: `cue-command-options'."
   :type '(repeat string)
   :group 'cue)
@@ -56,12 +56,12 @@ For example:
 
 (defcustom cue-fmt-command
   '("cue" "fmt")
-  "Cue format command."
+  "CUE format command."
   :type '(repeat string)
   :group 'cue)
 
 (defcustom cue-library-search-directories
-  nil "Sequence of Cue package search directories."
+  nil "Sequence of CUE package search directories."
   :type '(repeat directory)
   :group 'cue)
 
@@ -73,7 +73,7 @@ For example:
 
 (defvar cue--identifier-regexp
   "[a-zA-Z_][a-zA-Z0-9_]*"
-  "Regular expression matching a Cue identifier.")
+  "Regular expression matching a CUE identifier.")
 
 (defvar cue-font-lock-keywords
   (let ((builtin-regex (regexp-opt '("package" "import" "for" "in" "if" "let") 'words))
@@ -267,11 +267,11 @@ it should move backward to the beginning of the previous token."
 
 (defconst cue-mode-syntax-table
   (let ((table (make-syntax-table)))
-    ;; Comments. Cue supports /* */ and // as comment delimiters
+    ;; Comments. CUE supports /* */ and // as comment delimiters
     (modify-syntax-entry ?/ ". 124" table)
-    ;; Additionally, Cue supports # as a comment delimiter
+    ;; Additionally, CUE supports # as a comment delimiter
     (modify-syntax-entry ?\n ">" table)
-    ;; ", ', ,""" and ''' are quotations in Cue.
+    ;; ", ', ,""" and ''' are quotations in CUE.
     ;; both """ and ''' are handled by cue--syntax-propertize-function
     (modify-syntax-entry ?' "\"" table)
     (modify-syntax-entry ?\" "\"" table)
@@ -364,7 +364,7 @@ it should move backward to the beginning of the previous token."
 
 ;;;###autoload
 (defun cue-reformat-buffer ()
-  "Reformat entire buffer using the Cue format utility."
+  "Reformat entire buffer using the CUE format utility."
   (interactive)
   (let ((point (point))
         (file-name (buffer-file-name))

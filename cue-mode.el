@@ -131,7 +131,7 @@ For example:
 values to be formatted."
   `(progn
      (when cue-smie-verbose-p
-       (message (format ,message ,@format-args)))
+       (message ,message ,@format-args))
      nil))
 
 (defun cue-smie-rules-verbose (kind token)

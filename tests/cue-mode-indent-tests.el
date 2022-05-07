@@ -104,3 +104,21 @@ import (
 	life:  >0
 	nums:  list.MaxItems(10)
 }"))
+
+(ert-deftest cue--test-indent-multiline-string ()
+  "We should not alter multiline strings."
+  (cue--should-indent
+   "
+value: {
+	string: \"\"\"
+	Test multi
+	     line string
+	\"\"\"
+}"
+   "
+value: {
+	string: \"\"\"
+	Test multi
+	     line string
+	\"\"\"
+}"))

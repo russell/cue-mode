@@ -95,6 +95,8 @@ For example:
 
 (defun cue-syntax-stringify ()
   "Put `syntax-table' property correctly on single/triple quotes."
+  ;; This function is mostly a copy of the python multi-line string
+  ;; code.
   (let* ((ppss (save-excursion (backward-char 3) (syntax-ppss)))
          (string-start (and (eq t (nth 3 ppss)) (nth 8 ppss)))
          (quote-starting-pos (- (point) 3))
@@ -315,6 +317,7 @@ it should move backward to the beginning of the previous token."
                                       smie-indent-comment-continue
                                       smie-indent-comment-close
                                       smie-indent-comment-inside
+                                      smie-indent-inside-string
                                       smie-indent-keyword
                                       smie-indent-after-keyword
                                       smie-indent-empty-line

@@ -6,7 +6,7 @@
 ;; Keywords: data, languages
 ;; Package-Requires: ((emacs "25.1"))
 ;; URL: https://github.com/russell/cue-mode
-;; Version: 1.0.8
+;; Version: 1.0.9
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by

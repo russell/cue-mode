@@ -357,6 +357,7 @@ it should move backward to the beginning of the previous token."
                         (list file-to-eval))))
       (let ((outbuf (get-buffer-create output-buffer-name)))
         (with-current-buffer outbuf
+          (setq default-directory (file-name-directory file-to-eval))
           (let ((origional-point (point)))
             (setq buffer-read-only nil)
             (erase-buffer)

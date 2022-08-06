@@ -359,6 +359,7 @@ it should move backward to the beginning of the previous token."
              (outwindow (car (get-buffer-window-list outbuf)))
              (outwindow-start (when outwindow (window-start outwindow))))
         (with-current-buffer outbuf
+          (setq default-directory (file-name-directory file-to-eval))
           (let ((origional-point (point)))
             (setq buffer-read-only nil)
             (erase-buffer)

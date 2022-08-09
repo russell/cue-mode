@@ -355,7 +355,9 @@ it should move backward to the beginning of the previous token."
                                  collect "-I"
                                  collect dir)
                         (list file-to-eval))))
-      (let ((outbuf (get-buffer-create output-buffer-name)))
+      (let* ((outbuf (get-buffer-create output-buffer-name))
+             (outwindow (car (get-buffer-window-list outbuf)))
+             (outwindow-start (when outwindow (window-start outwindow))))
         (with-current-buffer outbuf
           (let ((origional-point (point)))
             (setq buffer-read-only nil)
@@ -365,7 +367,9 @@ it should move backward to the beginning of the previous token."
                   (cue-mode)
                   (view-mode))
               (compilation-mode nil))
-            (goto-char origional-point)))
+            (if outwindow
+                (set-window-start outwindow outwindow-start)
+              (goto-char origional-point))))
         (display-buffer outbuf '(nil (allow-no-window . t)))))))
 
 ;;;###autoload

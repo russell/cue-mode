@@ -22,7 +22,7 @@ common_setup() {
         export DAGGER_CACHE_FROM="$DAGGER_CACHE_FROM-$BATS_TEST_NAME"
     fi
 
-    SOPS_AGE_KEY_FILE="$(dirname "${BASH_SOURCE[0]}")/../../tests/age_key.txt"
+    SOPS_AGE_KEY_FILE="$(dirname "${BASH_SOURCE[0]}")/age_key.txt"
     export SOPS_AGE_KEY_FILE
 
     # cd into the directory containing the bats file

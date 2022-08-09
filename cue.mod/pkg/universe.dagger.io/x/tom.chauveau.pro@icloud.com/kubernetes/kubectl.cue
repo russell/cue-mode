@@ -1,10 +1,11 @@
+//Deprecated: in favor of universe.dagger.io/alpha package
 package kubernetes
 
 import (
 	"universe.dagger.io/docker"
 )
 
-_#DefaultVersion: "1.23.5"
+_#DefaultVersion: "1.23.7"
 
 // Kubectl client
 #Kubectl: {

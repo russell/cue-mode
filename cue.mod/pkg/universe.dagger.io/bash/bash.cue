@@ -2,11 +2,28 @@
 package bash
 
 import (
+	"list"
+
 	"dagger.io/dagger"
 	"dagger.io/dagger/core"
 
 	"universe.dagger.io/docker"
+	"universe.dagger.io/alpine"
 )
+
+// Like #Run, but with a pre-configured container image.
+#RunSimple: #Run & {
+	_simpleImage: #Image
+	input:        _simpleImage.output
+}
+
+// Default simple container image which can run bash
+#Image: alpine.#Build & {
+	packages: bash: _
+}
+
+// DEPRECATED: Use bash.#Image instead
+#SimpleImage: #Image
 
 // Run a bash script in a Docker container
 //  Since this is a thin wrapper over docker.#Run, we embed it.
@@ -37,6 +54,18 @@ import (
 
 	// Arguments to the script
 	args: [...string]
+	flags: [string]: string | bool
+
+	_flatFlags: list.FlattenN([
+			for k, v in flags {
+			if (v & bool) != _|_ {
+				[k]
+			}
+			if (v & string) != _|_ {
+				[k, v]
+			}
+		},
+	], 1)
 
 	// Where in the container to mount the scripts directory
 	_mountpoint: "/bash/scripts"
@@ -47,7 +76,7 @@ import (
 		entrypoint: []
 		command: {
 			name:   "bash"
-			"args": ["\(_mountpoint)/\(script._filename)"] + args
+			"args": ["\(_mountpoint)/\(script._filename)"] + args + _flatFlags
 			// FIXME: make default flags overrideable
 			flags: {
 				"--norc": true

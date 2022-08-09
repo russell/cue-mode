@@ -1,3 +1,4 @@
+//Deprecated: in favor of universe.dagger.io/alpha package
 package terraform
 
 import (
@@ -16,6 +17,9 @@ _#DefaultLogLevel: "off"
 #Run: {
 	// Terraform source code
 	source: dagger.#FS
+
+	// If set to true, the cache will never be triggered
+	always: bool | *false
 
 	// Terraform command (i.e. init, plan, apply)
 	cmd: string
@@ -69,7 +73,8 @@ _#DefaultLogLevel: "off"
 				contents: source
 			},
 			docker.#Run & {
-				workdir: "/src"
+				"always": always
+				workdir:  "/src"
 				command: {
 					name: cmd
 					args: _thisCmdArgs

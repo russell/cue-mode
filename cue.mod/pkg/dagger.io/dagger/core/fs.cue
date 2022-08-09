@@ -38,6 +38,8 @@ import "dagger.io/dagger"
 	output: dagger.#FS @dagger(generated)
 }
 
+// Read the contents of a UTF-8 encoded file into a CUE string. Any non-UTF-8
+// encoded content may have UTF replacement characters instead of the expected data.
 #ReadFile: {
 	$dagger: task: _name: "ReadFile"
 
@@ -90,6 +92,25 @@ import "dagger.io/dagger"
 		path: string | *"/"
 	}
 	dest: string
+}
+
+// Remove file or directory from a filesystem tree
+#Rm: {
+	$dagger: task: _name: "Rm"
+
+	// Input filesystem tree
+	input: dagger.#FS
+
+	// Path to delete (handle wildcard)
+	// (e.g. /file.txt or /*.txt)
+	path: string
+
+	// Allow wildcard selection
+	// Default to: true
+	allowWildcard: *true | bool
+
+	// Output filesystem tree
+	output: dagger.#FS @dagger(generated)
 }
 
 // Merge multiple FS trees into one
